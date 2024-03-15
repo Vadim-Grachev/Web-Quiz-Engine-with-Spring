@@ -1,50 +1,59 @@
 package engine;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.ArrayList;
+import lombok.Getter;
+import lombok.Setter;
 import java.util.List;
+import java.util.Set;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
+import javax.persistence.*;
+@Getter
+@Setter
+@Entity
 public class Quiz {
-    static int idCounter = 1;
-    private int id;
+    @Getter
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private long id;
+    @Getter
     @NotNull(message = "Quiz must have a title")
     @NotEmpty(message = "Quiz title should not be empty")
     private String title;
 
+    @Getter
     @NotNull(message = "Quiz must have a question")
     @NotEmpty(message = "Quiz title should not be empty")
     private String text;
+    @Getter
     @NotNull(message = "Quiz must have options")
     @Size(min = 2, message = "Quiz must contain at least two options")
-    private ArrayList<String> options;
+    @ElementCollection
+    @CollectionTable(
+            name = "QUIZ_OPTIONS",
+            joinColumns = @JoinColumn(name = "QUIZ_ID") )
+    @Column(name = "QUIZ_OPTION")
+    private List<String> options;
+    @ElementCollection
+    @CollectionTable(
+            name = "QUIZ_ANSWERS",
+            joinColumns = @JoinColumn(name = "QUIZ_ID") )
+    @Column(name = "QUIZ_ANSWER")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private List<Integer> answer = new ArrayList<>();
-
-    public Quiz(String title, String text, ArrayList<String> options, List<Integer> answer) {
+    private Set<Integer> answer;
+    /*
+    public Quiz(String title, String text, List<String> options, Set<Integer> answer) {
         this.title = title;
         this.text = text;
         this.options = options;
         this.answer = answer;
     }
-    public Quiz() {
-        this.id = idCounter++;
-    }
-    public int getId() { return id; }
-    public String getTitle() {
-        return title;
-    }
-    public String getText() {
-        return text;
-    }
-    public ArrayList<String> getOptions() {
-        return options;
-    }
+    public Quiz() {}
+
     @JsonIgnore
-    public List<Integer> getAnswer() {
+    public Set<Integer> getAnswer() {
         return answer;
     }
     public boolean isCorrect(List<Integer> answerInput) {
@@ -56,13 +65,14 @@ public class Quiz {
     public void setText(String text) {
         this.text = text;
     }
-    public void setOptions(ArrayList<String> options) {
+    public void setOptions(List<String> options) {
         this.options = options;
     }
-    public void setAnswer(List<Integer> answer) {
+    public void setAnswer(Set<Integer> answer) {
         this.answer = answer;
     }
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
+    */
 }

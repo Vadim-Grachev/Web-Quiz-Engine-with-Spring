@@ -1,22 +1,36 @@
 package engine;
 
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-
-@Component
+@Service
 public class StorageService {
-    private final Map<Integer, Quiz> quizzes = new ConcurrentHashMap<>();
-    public void add(Quiz quiz) {
-        quizzes.put(quiz.getId(), quiz);
+    private final QuizRepository quizRepository;
+    @Autowired
+    public StorageService(QuizRepository quizRepository) {
+        this.quizRepository = quizRepository;
     }
-    public Optional<Quiz> get(int id) {
-        return Optional.ofNullable(quizzes.get(id));
+    public Quiz add(Quiz quiz) {
+        return quizRepository.save(quiz);
     }
-    public Collection<Quiz> getQuizzes() {
-        return quizzes.values();
+    public Quiz get(long id) {
+        return quizRepository
+                .findById(id)
+                .orElseThrow(QuizNotFoundException::new);
+    }
+    public List<Quiz> getQuizzes() {
+        List<Quiz> allQuizzes = new ArrayList<>();
+        quizRepository.findAll().forEach(allQuizzes::add);
+        return allQuizzes;
+    }
+    public Response solve(long id, QuizAnswer quizAnswer) {
+        return this
+                .get(id)
+                .getAnswer()
+                .equals(quizAnswer.getAnswer())
+                ? new Response(true, Response.CORRECT_ANSWER)
+                : new Response(false, Response.WRONG_ANSWER);
     }
 }

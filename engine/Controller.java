@@ -1,13 +1,9 @@
 package engine;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
 import javax.validation.Valid;
-import java.util.Collection;
+import java.util.List;
 
 
 @RestController
@@ -21,7 +17,7 @@ public class Controller {
     }
 
     @GetMapping("quizzes")
-    public Collection<Quiz> getQuizzes() {
+    public List<Quiz> getQuizzes() {
         return storage.getQuizzes();
     }
     @PostMapping("quizzes")
@@ -30,17 +26,11 @@ public class Controller {
     return quiz;
     }
     @GetMapping("quizzes/{id}")
-    public Object getQuiz(@PathVariable int id) {
-        return storage.get(id).orElseThrow(QuizNotFoundException::new); }
+    public Quiz getQuiz(@PathVariable long id) {
+        return storage.get(id); }
 
     @PostMapping("quizzes/{id}/solve")
-    public Object solveQuiz(@PathVariable int id, @Valid @RequestBody QuizAnswer quizAnswer) {
-        return storage
-                .get(id)
-                .orElseThrow(QuizNotFoundException::new)
-                .getAnswer()
-                .equals(quizAnswer.getAnswer())
-                ? Response.correctAnswer
-                : Response.wrongAnswer;
+    public Response solveQuiz(@PathVariable long id, @RequestBody QuizAnswer quizAnswer) {
+        return storage.solve(id, quizAnswer);
     }
 }
