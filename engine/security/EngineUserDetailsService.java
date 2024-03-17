@@ -1,6 +1,6 @@
 package engine.security;
 
-import engine.dto.User;
+import engine.dto.entity.User;
 import engine.dto.UserStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

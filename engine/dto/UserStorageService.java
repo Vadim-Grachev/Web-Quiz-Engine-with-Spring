@@ -1,5 +1,6 @@
 package engine.dto;
 
+import engine.dto.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import engine.exception.UserAlreadyExistsException;
@@ -9,13 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Service
 public class UserStorageService {
 
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserStorageService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
     public User registerNewUser(User user) {
         if (userRepository.existsById(user.getEmail())) {
             throw new UserAlreadyExistsException();
@@ -30,6 +27,10 @@ public class UserStorageService {
         return userRepository
                 .findById(email)
                 .orElseThrow(UserNotFoundException::new);
+    }
+    @Autowired
+    public void UserStorageService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
     @Autowired
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {

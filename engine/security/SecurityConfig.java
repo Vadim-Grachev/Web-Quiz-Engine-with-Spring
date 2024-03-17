@@ -36,15 +36,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http.httpBasic()
                 .and().authorizeRequests()
-                    .antMatchers("/api/register").anonymous()
-                    .antMatchers("/api/quizzes", "/api/quizzes/**").authenticated()
-                    .antMatchers("/actuator/shutdown").permitAll()
-                    .antMatchers("/h2-console/**").hasRole("ADMIN")
-                .and().authorizeRequests()
-                    .anyRequest().authenticated()
+                .antMatchers("/api/register").anonymous()
+                .antMatchers("/api/quizzes", "/api/quizzes/**").authenticated()
+                .antMatchers("/actuator/shutdown").permitAll()
+                .antMatchers("/h2-console/**")
+                .hasAnyAuthority(UserRole.ROLE_ADMIN.name(), UserRole.ROLE_USER.name())  //for testing
+                .anyRequest().hasAuthority(UserRole.ROLE_USER.name())
                 .and()
-                    .csrf().disable()
-                    .headers().frameOptions().disable();
+                .csrf().disable()
+                .headers().frameOptions().disable();
     }
 
     @Bean

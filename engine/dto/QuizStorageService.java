@@ -1,10 +1,17 @@
 package engine.dto;
 
 import engine.api.QuizAnswer;
-import engine.api.Response;
+import engine.dto.entity.Quiz;
+
 import engine.exception.QuizNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,13 +35,10 @@ public class QuizStorageService {
         quizRepository.findAll().forEach(allQuizzes::add);
         return allQuizzes;
     }
-    public Response solve(long id, QuizAnswer quizAnswer) {
-        return this
-                .get(id)
+    public boolean solve(long id, QuizAnswer quizAnswer) {
+        return  get(id)
                 .getAnswer()
-                .equals(quizAnswer.getAnswer())
-                ? new Response(true, Response.CORRECT_ANSWER)
-                : new Response(false, Response.WRONG_ANSWER);
+                .equals(quizAnswer.getAnswer());
     }
     public void delete(long id) {
         if (quizRepository.existsById(id)) {
@@ -42,5 +46,10 @@ public class QuizStorageService {
             return;
         }
         throw new QuizNotFoundException();
+    }
+
+    public Page<Quiz> getAllQuizzes(int pageNumber, int pageSize, String sortBy) {
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
+        return (Page<Quiz>) quizRepository.findAll(paging);
     }
 }
